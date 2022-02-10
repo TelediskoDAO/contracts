@@ -202,18 +202,16 @@ contract Voting is AccessControl {
             allAccounts.push(newDelegate);
             _countCalls[newDelegate]++;
         }
-
-        assert(newDelegate == _delegates[newDelegate]);
     }
 
-    /*function noSubdelegationInv() public view {
+    function noSubdelegationInv() public view {
         for (uint256 i = 0; i < allAccounts.length; i++) {
             assert(
                 _delegates[allAccounts[i]] ==
                     _delegates[_delegates[allAccounts[i]]]
             );
         }
-    }*/
+    }
 
     function _moveVotingPower(
         address fromDelegate,
