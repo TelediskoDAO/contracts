@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "../ShareholderRegistry/IShareholderRegistry.sol";
 import "./IVoting.sol";
 
-contract Voting is AccessControl {
+contract Voting {
     bytes32 public MANAGER_ROLE = keccak256("MANAGER_ROLE");
     bytes32 public RESOLUTION_ROLE = keccak256("RESOLUTION_ROLE");
 
@@ -37,32 +37,32 @@ contract Voting is AccessControl {
     );
 
     constructor() {
-        _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+        //_setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
 
-    modifier onlyToken() {
-        require(
-            msg.sender == address(_token),
-            "Voting: only Token contract can call this method."
-        );
-        _;
-    }
+    //modifier onlyToken() {
+    //    require(
+    //        msg.sender == address(_token),
+    //        "Voting: only Token contract can call this method."
+    //    );
+    //    _;
+    // }
 
-    function canVote(address account) public view returns (bool) {
-        return getDelegate(account) != address(0);
-    }
+    //function canVote(address account) public view returns (bool) {
+    //    return getDelegate(account) != address(0);
+    // }
 
-    function setToken(IERC20 token) external onlyRole(MANAGER_ROLE) {
-        _token = token;
-    }
+    //function setToken(IERC20 token) external onlyRole(MANAGER_ROLE) {
+    //    _token = token;
+    //}
 
-    function setShareholderRegistry(IShareholderRegistry shareholderRegistry)
-        external
-        onlyRole(MANAGER_ROLE)
-    {
-        _shareholderRegistry = shareholderRegistry;
-        _contributorRole = _shareholderRegistry.CONTRIBUTOR_STATUS();
-    }
+    //function setShareholderRegistry(IShareholderRegistry shareholderRegistry)
+    //    external
+    //    onlyRole(MANAGER_ROLE)
+    //{
+    //_shareholderRegistry = shareholderRegistry;
+    //_contributorRole = _shareholderRegistry.CONTRIBUTOR_STATUS();
+    //}
 
     /*function afterRemoveContributor(address account)
         external
@@ -95,18 +95,18 @@ contract Voting is AccessControl {
     /// @param from The sender's address
     /// @param to The receiver's address
     /// @param amount The amount sent
-    function afterTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) external onlyToken {
-        _moveVotingPower(getDelegate(from), getDelegate(to), amount);
-    }
+    //function afterTokenTransfer(
+    //    address from,
+    //    address to,
+    //    uint256 amount
+    //) external {
+    //    _moveVotingPower(getDelegate(from), getDelegate(to), amount);
+    // }
 
     /// @dev Returns the account's current delegate
     /// @param account The account whose delegate is requested
     /// @return Account's voting power
-    function getDelegate(address account) public view returns (address) {
+    function getDelegate(address account) internal view returns (address) {
         return _delegates[account];
     }
 
@@ -131,14 +131,14 @@ contract Voting is AccessControl {
     /// @notice Sub-delegation is not allowed
     /// @param newDelegate Destination address of module transaction.
     function delegate(address newDelegate) public {
-        require(
-            _shareholderRegistry.isAtLeast(_contributorRole, msg.sender),
-            "Voting: only contributors can delegate."
-        );
-        require(
-            _shareholderRegistry.isAtLeast(_contributorRole, newDelegate),
-            "Voting: only contributors can be delegated."
-        );
+        //require(
+        //    _shareholderRegistry.isAtLeast(_contributorRole, msg.sender),
+        //    "Voting: only contributors can delegate."
+        //);
+        //require(
+        //    _shareholderRegistry.isAtLeast(_contributorRole, newDelegate),
+        //    "Voting: only contributors can be delegated."
+        //);
         _delegate(msg.sender, newDelegate);
     }
 
@@ -196,45 +196,45 @@ contract Voting is AccessControl {
         assert(newDelegate == _delegates[newDelegate]);
     }
 
-    function _moveVotingPower(
-        address fromDelegate,
-        address toDelegate,
-        uint256 amount
-    ) private {
-        if (fromDelegate != toDelegate && amount > 0) {
-            if (fromDelegate != address(0)) {
-                _beforeMoveVotingPower(fromDelegate);
-                uint256 oldVotingPower = _votingPower[fromDelegate];
-                _votingPower[fromDelegate] = oldVotingPower - amount;
-                emit DelegateVotesChanged(
-                    fromDelegate,
-                    oldVotingPower,
-                    _votingPower[fromDelegate]
-                );
-            } else {
-                _beforeUpdateTotalVotingPower();
-                _totalVotingPower += amount;
-            }
+    //function _moveVotingPower(
+    //    address fromDelegate,
+    //    address toDelegate,
+    //    uint256 amount
+    //) private {
+    //    if (fromDelegate != toDelegate && amount > 0) {
+    //        if (fromDelegate != address(0)) {
+    //           // _beforeMoveVotingPower(fromDelegate);
+    //            uint256 oldVotingPower = _votingPower[fromDelegate];
+    //            _votingPower[fromDelegate] = oldVotingPower - amount;
+    //            //emit DelegateVotesChanged(
+    //            //    fromDelegate,
+    //            //    oldVotingPower,
+    //            //    _votingPower[fromDelegate]
+    //            //);
+    //        } else {
+    //            //_beforeUpdateTotalVotingPower();
+    //            _totalVotingPower += amount;
+    //        }
 
-            if (toDelegate != address(0)) {
-                _beforeMoveVotingPower(toDelegate);
-                uint256 oldVotingPower = _votingPower[toDelegate];
-                _votingPower[toDelegate] = oldVotingPower + amount;
-                emit DelegateVotesChanged(
-                    toDelegate,
-                    oldVotingPower,
-                    _votingPower[toDelegate]
-                );
-            } else {
-                _beforeUpdateTotalVotingPower();
-                _totalVotingPower -= amount;
-            }
-        }
-    }
+    //        if (toDelegate != address(0)) {
+    //            //_beforeMoveVotingPower(toDelegate);
+    //            uint256 oldVotingPower = _votingPower[toDelegate];
+    //            _votingPower[toDelegate] = oldVotingPower + amount;
+    //emit DelegateVotesChanged(
+    //    toDelegate,
+    //    oldVotingPower,
+    //   _votingPower[toDelegate]
+    //);
+    //        } else {
+    //_beforeUpdateTotalVotingPower();
+    //           _totalVotingPower -= amount;
+    //       }
+    //  }
+    // }
 
-    function _beforeDelegate(address delegator) internal virtual {}
+    //function _beforeDelegate(address delegator) internal virtual {}
 
-    function _beforeMoveVotingPower(address account) internal virtual {}
+    //function _beforeMoveVotingPower(address account) internal virtual {}
 
-    function _beforeUpdateTotalVotingPower() internal virtual {}
+    //function _beforeUpdateTotalVotingPower() internal virtual {}
 }
