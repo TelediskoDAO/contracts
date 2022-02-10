@@ -176,9 +176,9 @@ contract Voting is AccessControl {
             "Voting: the delegator is delegated. No sub-delegations allowed."
         );
 
-        _beforeDelegate(delegator);
+        //_beforeDelegate(delegator);
 
-        uint256 delegatorBalance = _token.balanceOf(delegator);
+        //uint256 delegatorBalance = _token.balanceOf(delegator);
         _delegates[delegator] = newDelegate;
 
         if (delegator != newDelegate && newDelegate != address(0)) {
@@ -189,28 +189,11 @@ contract Voting is AccessControl {
             _delegators[currentDelegate]--;
         }
 
-        emit DelegateChanged(delegator, currentDelegate, newDelegate);
+        //emit DelegateChanged(delegator, currentDelegate, newDelegate);
 
-        _moveVotingPower(currentDelegate, newDelegate, delegatorBalance);
+        //_moveVotingPower(currentDelegate, newDelegate, delegatorBalance);
 
-        if (_countCalls[delegator] == 0) {
-            allAccounts.push(delegator);
-            _countCalls[delegator]++;
-        }
-
-        if (_countCalls[newDelegate] == 0) {
-            allAccounts.push(newDelegate);
-            _countCalls[newDelegate]++;
-        }
-    }
-
-    function noSubdelegationInv() public view {
-        for (uint256 i = 0; i < allAccounts.length; i++) {
-            assert(
-                _delegates[allAccounts[i]] ==
-                    _delegates[_delegates[allAccounts[i]]]
-            );
-        }
+        assert(newDelegate == _delegates[newDelegate]);
     }
 
     function _moveVotingPower(
