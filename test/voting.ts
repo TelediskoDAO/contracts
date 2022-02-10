@@ -645,5 +645,17 @@ describe("Voting", () => {
       await voting.connect(delegated1).delegate(delegated1.address);
       expect(await voting.getTotalVotingPower()).equal(20);
     });
+
+    it.only("when A delegates B and then A transfers tokens to B, the voting power of B and the total should remain unchanged", async () => {
+      await token.mint(delegator1.address, 10);
+      await token.mint(delegated1.address, 8);
+      await voting.connect(delegator1).delegate(delegated1.address);
+      expect(await voting.getVotingPower(delegated1.address)).equal(18);
+      expect(await voting.getTotalVotingPower()).equal(18);
+
+      await token.connect(delegator1).transfer(delegated1.address, 10);
+      expect(await voting.getVotingPower(delegated1.address)).equal(18);
+      expect(await voting.getTotalVotingPower()).equal(18);
+    });
   });
 });

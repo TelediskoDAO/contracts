@@ -20,6 +20,9 @@ contract Voting is AccessControl {
     mapping(address => uint256) _votingPower;
     mapping(address => uint256) _delegators;
 
+    address[] allAccounts;
+    mapping(address => uint256) _countCalls;
+
     uint256 _totalVotingPower;
 
     event DelegateChanged(
@@ -61,7 +64,7 @@ contract Voting is AccessControl {
         _contributorRole = _shareholderRegistry.CONTRIBUTOR_STATUS();
     }
 
-    function afterRemoveContributor(address account)
+    /*function afterRemoveContributor(address account)
         external
         onlyRole(RESOLUTION_ROLE)
     {
@@ -81,9 +84,12 @@ contract Voting is AccessControl {
                 _moveVotingPower(account, address(0), individualVotingPower);
             }
         }
-    }
+    }*/
 
     /// @dev Hook to be called by the companion token upon token transfer
+    /// @notice This method is called every time a token is transferred to an account. The amount must have been trasnferred before from another account
+    /// or transferred for the first time by address 0. Therefore, there can never be the case that someone with voting power 0 is transferring
+    /// a token, because that token must have been first trasferred to them, hence increasing their voting power.
     /// @notice Only the companion token can call this method
     /// @notice The voting power transfer logic relies on the correct usage of this hook from the companion token
     /// @param from The sender's address
@@ -137,6 +143,8 @@ contract Voting is AccessControl {
     }
 
     function _delegate(address delegator, address newDelegate) internal {
+        require(delegator != address(0) && newDelegate != address(0));
+
         address currentDelegate = getDelegate(delegator);
         if (currentDelegate == address(0)) {
             require(
@@ -184,33 +192,58 @@ contract Voting is AccessControl {
         emit DelegateChanged(delegator, currentDelegate, newDelegate);
 
         _moveVotingPower(currentDelegate, newDelegate, delegatorBalance);
+
+        if (_countCalls[delegator] == 0) {
+            allAccounts.push(delegator);
+            _countCalls[delegator]++;
+        }
+
+        if (_countCalls[newDelegate] == 0) {
+            allAccounts.push(newDelegate);
+            _countCalls[newDelegate]++;
+        }
+
+        assert(newDelegate == _delegates[newDelegate]);
     }
 
+    /*function noSubdelegationInv() public view {
+        for (uint256 i = 0; i < allAccounts.length; i++) {
+            assert(
+                _delegates[allAccounts[i]] ==
+                    _delegates[_delegates[allAccounts[i]]]
+            );
+        }
+    }*/
+
     function _moveVotingPower(
-        address from,
-        address to,
+        address fromDelegate,
+        address toDelegate,
         uint256 amount
     ) private {
-        if (from != to && amount > 0) {
-            if (from != address(0)) {
-                _beforeMoveVotingPower(from);
-                uint256 oldVotingPower = _votingPower[from];
-                _votingPower[from] = oldVotingPower - amount;
+        if (fromDelegate != toDelegate && amount > 0) {
+            if (fromDelegate != address(0)) {
+                _beforeMoveVotingPower(fromDelegate);
+                uint256 oldVotingPower = _votingPower[fromDelegate];
+                _votingPower[fromDelegate] = oldVotingPower - amount;
                 emit DelegateVotesChanged(
-                    from,
+                    fromDelegate,
                     oldVotingPower,
-                    _votingPower[from]
+                    _votingPower[fromDelegate]
                 );
             } else {
                 _beforeUpdateTotalVotingPower();
                 _totalVotingPower += amount;
             }
 
-            if (to != address(0)) {
-                _beforeMoveVotingPower(to);
-                uint256 oldVotingPower = _votingPower[to];
-                _votingPower[to] = oldVotingPower + amount;
-                emit DelegateVotesChanged(to, oldVotingPower, _votingPower[to]);
+            if (toDelegate != address(0)) {
+                _beforeMoveVotingPower(toDelegate);
+                uint256 oldVotingPower = _votingPower[toDelegate];
+                _votingPower[toDelegate] = oldVotingPower + amount;
+                emit DelegateVotesChanged(
+                    toDelegate,
+                    oldVotingPower,
+                    _votingPower[toDelegate]
+                );
             } else {
                 _beforeUpdateTotalVotingPower();
                 _totalVotingPower -= amount;
