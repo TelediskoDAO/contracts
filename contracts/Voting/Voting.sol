@@ -119,4 +119,8 @@ contract Voting {
 
         assert(newDelegate == _delegates[newDelegate]);
     }
+
+    function echidna_voting_power() public returns (bool) {
+        return (_totalVotingPower >= 0);
+    }
 }
