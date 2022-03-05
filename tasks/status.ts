@@ -3,7 +3,7 @@ import { keccak256, parseEther, toUtf8Bytes } from "ethers/lib/utils";
 import { loadContract } from "./config";
 import { ShareholderRegistry__factory } from "../typechain";
 
-task("mint-share", "Mint a share to an address")
+task("share", "Mint a share to an address")
   .addPositionalParam("account", "The address")
   .setAction(async ({ account }: { account: string }, hre) => {
     const contract = await loadContract(
