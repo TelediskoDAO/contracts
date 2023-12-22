@@ -31,7 +31,7 @@ const DAY = 60 * 60 * 24;
 describe("Resolution", async () => {
   let snapshotId: string;
 
-  let resolutionId = 25;
+  let resolutionId = 1;
   let resolutionSnapshotId = 42;
 
   let managingBoardStatus: string;

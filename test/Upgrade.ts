@@ -14,8 +14,6 @@ import {
   ShareholderRegistry,
 } from "../typechain";
 
-import { DEPLOY_SEQUENCE, generateDeployContext } from "../lib";
-import { NeokingdomDAOMemory } from "../lib/environment/memory";
 import { ROLES } from "../lib/utils";
 import { getEVMTimestamp, mineEVMBlock, setEVMTimestamp } from "./utils/evm";
 import { setupDAO } from "./utils/setup";
@@ -75,7 +73,7 @@ describe("Upgrade", () => {
   describe("upgrades", async () => {
     var currentResolution: number;
     beforeEach(async () => {
-      currentResolution = 24;
+      currentResolution = 0;
     });
 
     async function _mintTokens(user: SignerWithAddress, tokens: number) {
