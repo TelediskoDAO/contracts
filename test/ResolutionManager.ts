@@ -31,7 +31,7 @@ const DAY = 60 * 60 * 24;
 describe("Resolution", async () => {
   let snapshotId: string;
 
-  let resolutionId = 1;
+  let resolutionId = 48;
   let resolutionSnapshotId = 42;
 
   let managingBoardStatus: string;
@@ -310,7 +310,7 @@ describe("Resolution", async () => {
       await expect(
         resolution
           .connect(managingBoard)
-          .updateResolution(42, "updated test", 6, true, [], [])
+          .updateResolution(49, "updated test", 6, true, [], [])
       ).revertedWith("Resolution: does not exist");
     });
 
