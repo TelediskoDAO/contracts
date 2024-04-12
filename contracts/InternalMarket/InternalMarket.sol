@@ -97,8 +97,8 @@ contract InternalMarket is Initializable, HasRole, InternalMarketBase {
      * @dev Redeem the locked tokens.
      * @param amount The amount of tokens to redeem.
      */
-    function redeem(uint amount) public {
-        _redeem(_msgSender(), amount);
+    function redeem(address to, uint amount) public {
+        _redeem(to, amount);
     }
 
     /**
